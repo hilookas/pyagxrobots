@@ -384,6 +384,7 @@ class DeviceCan:
                                bitrate=self.bitrate) as client:
             # stop_event = threading.Event()
             t_receive = threading.Thread(target=self.EnableAsynsCan)
+            t_receive.daemon = True
             t_receive.start()
             # self.EnableAsynsCan(client)
 
