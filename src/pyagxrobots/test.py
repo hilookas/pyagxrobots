@@ -3,7 +3,6 @@
 import pyagxrobots
 import time
 scoutmini=pyagxrobots.pysdkugv.ScoutMiniBase()
-scoutmini.EnableCAN()
 num=5
 while num>0:
     

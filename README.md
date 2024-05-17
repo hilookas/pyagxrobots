@@ -89,7 +89,6 @@ robots=pyagxrobots.pysdkugv.robotstype()  #    robotstype depend on your robot
 #### function list:
 
 ```python
-EnableCAN()
 SetMotionCommand()
 SetLightCommand()
 GetRobotStae:
@@ -122,11 +121,6 @@ GetRobotStae:
         motor_temp()
         driver_state()
 ```
-
-#### EnableCAN
-
-- **Prototype**: `EnableCAN()`
-- **Description**: Enable command and control mode.
 
 #### SetMotionCommand
 
@@ -206,7 +200,6 @@ GetRobotStae:
 import pyagxrobots
 import time
 scoutmini=pyagxrobots.pysdkugv.ScoutMiniBase()
-scoutmini.EnableCAN()
 num=5
 while num>0:
     
@@ -224,7 +217,6 @@ while num>0:
 import pyagxrobots
 import time
 bunker=pyagxrobots.pysdkugv.BunkerBase()
-bunker.EnableCAN()
 num=5
 while num>0:
     
