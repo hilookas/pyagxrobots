@@ -1,40 +1,112 @@
-#!/usr/bin/env python3
-# coding=UTF-8
-
-import sys
-import os
-import asyncio
 import can
-import time
-import threading
 import ctypes
-import struct
-import math
-from can import Message
-from typing import ByteString, Set, Type
-from sqlite3.dbapi2 import Date
-
 import pyagxrobots.UGVConfigMsg as UGVBaseMsg
+import time
 
-# Type of current operating system
-# posix： Linux
-# nt: Windows
-# java:
+class UGV:
+    UGVBaseMsg._init()
 
-os_is_nt = os.name == 'nt'
-# Linux and Mac are both part of the posix standard
-# posix: Portable API for Unix-like operating systems
-os_is_posix = os.name == 'posix'
+    def __init__(self, bustype="socketcan", channel="can0", bitrate=500000):
+        UGVBaseMsg._init()
 
+        self.bus = can.Bus(bustype=bustype, channel=channel, bitrate=bitrate)
 
-class CanMsgsGet:
-    def __init__(self, capacity=1024 * 4):
-        self.size = 0
-        self.rear = 0
-        self.front = 0
-        self.array = capacity
+        # Get base version
+        while True:
+            msg = self.bus.recv(0.01)
+            if msg:
+                if msg.arbitration_id == 0x151:
+                    self.base_version = 1
+                    break
+                elif msg.arbitration_id == 0x241:
+                    self.base_version = 2
+                    break
+            time.sleep(0.01)
 
-    def CanMsgsProcessV1(self, msg):
+        # Control the chassis in Can control mode
+        # you need to dial the remote control SWB to the top
+        if self.base_version == 2:
+            self.SendMessage(UGVBaseMsg.CanIDV2.CTRL_MODE_CONFIG_ID, [0x01])
+
+        self.notifier = can.Notifier(self.bus, [ self.ListenMessage, ])
+
+    def stop(self):
+        self.notifier.stop()
+        self.bus.shutdown()
+
+    def SendMessage(self, id, data):
+        try:
+            self.bus.send(can.Message(arbitration_id=id, is_extended_id=False, data=data))
+        except can.CanError:
+            print("Message NOT sent")
+
+    def SetMotionCommand(self,
+        linear_vel: float = 0.0,
+        angular_vel: float = 0.0,
+        lateral_vel: float = 0.0,
+        steering_angle: float = 0.0
+    ):
+        if self.base_version == 1:
+            if abs(angular_vel) > abs(steering_angle):
+                angular = angular_vel
+            else:
+                angular = steering_angle
+            self.SendMessage(UGVBaseMsg.CanIDV1.MOTION_COMMAND_ID, [
+                0x01,
+                0,
+                (int(linear_vel)& 0xff),
+                (int(angular) & 0xff),
+                (int(lateral_vel) & 0xff),
+                0,
+                0,
+                0,
+            ])
+        elif self.base_version == 2:
+            linear_cmd = linear_vel * 1000
+            angular_cmd = angular_vel * 1000
+            lateral_cmd = lateral_vel * 1000
+            steering_cmd = steering_angle * 1000
+            self.SendMessage(UGVBaseMsg.CanIDV2.MOTION_COMMAND_ID, [
+                int(linear_cmd) >> 8 & 0xff,
+                (int(linear_cmd) & 0x00ff),
+                int(angular_cmd) >> 8 & 0xff,
+                (int(angular_cmd) & 0x00ff),
+                int(lateral_cmd) >> 8 & 0xff,
+                (int(lateral_cmd) & 0x00ff),
+                int(steering_cmd) >> 8 & 0xff,
+                (int(steering_cmd) & 0x00ff)
+            ])
+
+    def SetLightCommand(self,
+        front_mode: int = 0,
+        front_custom_value: int = 0,
+        rear_mode: int = 0,
+        rear_custom_value: int = 0
+    ):
+        if self.base_version == 1:
+            self.SendMessage(UGVBaseMsg.CanIDV1.LIGHT_COMMAND_ID, [
+                0x01,
+                front_mode,
+                front_custom_value,
+                rear_mode,
+                rear_custom_value,
+                0,
+                0,
+                0
+            ])
+        elif self.base_version == 2:
+            self.SendMessage(UGVBaseMsg.CanIDV2.LIGHT_COMMAND_ID, [
+                0x01,
+                front_mode,
+                front_custom_value,
+                rear_mode,
+                rear_custom_value,
+                0,
+                0,
+                0
+            ])
+
+    def ProcessMessageV1(self, msg):
         if (msg.arbitration_id == UGVBaseMsg.CanIDV1.SYSTEM_STATE_ID):
             vehicle_state = int(msg.data[0])
             UGVBaseMsg.SetVehicleState(vehicle_state)
@@ -132,7 +204,7 @@ class CanMsgsGet:
             motor4_temp = msg.data[5]
             UGVBaseMsg.SetMotor4Temp(motor4_temp)
 
-    def CanMsgsProcessV2(self, msg):
+    def ProcessMessageV2(self, msg):
         """
         Process Can bus data according to ID
         """
@@ -353,289 +425,8 @@ class CanMsgsGet:
             var_a = msg.data[5]
             UGVBaseMsg.SetVarA(var_a)
 
-
-class DeviceCan:
-    """
-
-    """
-
-    def __init__(self, bustype=None, channel=None, bitrate=None):
-        UGVBaseMsg._init()
-        if bitrate is None:
-            self.bitrate = 500000
-        else:
-            self.bitrate = bitrate
-
-        if bustype is None:
-            self.bustype = "socketcan"
-        else:
-            self.bustype = bustype
-
-        if channel is None:
-            self.channel = "can0"
-        else:
-            default_channel = channel
-            self.channel = default_channel
-        self.base_verson = self.GetBaseVersion()
-
-        # with self.canport as server:
-        with can.interface.Bus(bustype=self.bustype,
-                               channel=self.channel,
-                               bitrate=self.bitrate) as client:
-            # stop_event = threading.Event()
-            t_receive = threading.Thread(target=self.EnableAsynsCan)
-            t_receive.daemon = True
-            t_receive.start()
-            # self.EnableAsynsCan(client)
-
-            try:
-                if self.base_verson==1:
-                    pass
-                elif self.base_verson==2:
-                    # while (UGVBaseMsg.GetLen() < UGVBaseMsg.CanMsgLen.CAN_MSG_LEN):
-                    #     self.msg = Message(
-                    #         arbitration_id=UGVBaseMsg.CanIDV2.VERSION_REQUEST_ID,
-                    #         data=[0x01],
-                    #         is_extended_id=False)
-                    #     self.CanSend(self.msg)
-                        time.sleep(0.1)
-
-            except (KeyboardInterrupt, SystemExit):
-                pass
-            # stop_event.set()
-            time.sleep(0.5)
-
-    def GetBaseVersion(self):
-        self.base_verson=0
-        self.canport = can.interface.Bus(bustype=self.bustype,
-                                         channel=self.channel,
-                                         bitrate=self.bitrate)
-        while (self.base_verson == 0):
-            msg = self.canport.recv(0.01)
-            if(msg.arbitration_id == 0x151):
-                self.base_verson = 1
-                return self.base_verson
-            elif(msg.arbitration_id == 0x241):
-                self.base_verson = 2
-                return self.base_verson
-            else:
-                self.base_verson = 0
-                
-
-    async def CanReceive(self, bus, stop_event):
-        """The loop for receiving."""
-        print("Start receiving messages")
-        SlectMsg = CanMsgsGet()
-        while not stop_event.is_set():
-
-            self.rx_msg = await bus.recv(0.002)
-            if self.rx_msg is not None:
-                if(self.base_verson == 1):
-                    SlectMsg.CanMsgsProcessV2(self.rx_msg)
-                    # print("rx: {}".format(self.rx_msg))
-                elif(self.base_verson == 2):
-                    SlectMsg.CanMsgsProcessV2(self.rx_msg)
-                    # print("rx: {}".format(self.rx_msg))
-
-        await bus.recv()
-        print("Stopped receiving messages")
-        if stop_event.is_set() == False:
-            stop_event.set()
-
-    def CanGet(self):
-        self.canport = can.ThreadSafeBus(interface=self.bustype,
-                                         channel=self.channel,
-                                         bitrate=self.bitrate)
-
-        msg = self.canport.recv(0.002)
-        print(msg)
-        return msg
-
-    def EnableAsynsCan(self):
-
-        LOOP = asyncio.new_event_loop()
-        asyncio.set_event_loop(LOOP)
-        # Run until main coroutine finishes
-        LOOP.run_until_complete(self.AsynsCan())
-
-    def ListenerMessage(self, msg):
-        SlectMsg = CanMsgsGet()
-        if (self.base_verson == 1):
-            SlectMsg.CanMsgsProcessV1(msg)
-        elif (self.base_verson == 2):
-            SlectMsg.CanMsgsProcessV2(msg)
-
-    async def AsynsCan(self):
-        bus = can.Bus(interface=self.bustype,
-                      channel=self.channel,
-                      bitrate=self.bitrate)
-
-        reader = can.BufferedReader()
-        logger = can.Logger('logfile.asc')
-        listeners = [
-            self.ListenerMessage,
-            reader,  # AsyncBufferedReader() listener
-            logger  # Regular Listener object
-        ]
-        loop = asyncio.get_event_loop()
-        notifier = can.Notifier(bus, listeners, loop=loop)
-        while 1:
-            msg = reader.get_message()
-            await asyncio.sleep(0.2)
-
-        notifier.stop()
-
-    def CanDataUpdate(self):
-        msg = self.CanGet()
-        SlectMsg = CanMsgsGet()
-        if msg is None:
-            print('time occerred,no message')
-        elif(self.base_verson == 1):
-            SlectMsg.CanMsgsProcessV1(msg)
-        elif(self.base_verson == 2):
-            SlectMsg.CanMsgsProcessV2(msg)
-
-    def CanSend(self, msg):
-
-        self.canport = can.ThreadSafeBus(interface=self.bustype,
-                                         channel=self.channel,
-                                         bitrate=self.bitrate)
-        with self.canport as bus:
-            try:
-                bus.send(msg)
-            except can.CanError:
-                print("Message NOT sent")
-
-
-class UGV:
-    """
-        EnableCANCtrl()
-        SendVersionRequest()
-        SendErrorClearByte()
-        EnableLightCtrl()
-        DisableLightCtrl()
-        LightFrontMode()
-        SendLinerVelocity()
-        SendAngularVelocity()
-
-        GetLightMode()        
-        GetSysVersion()
-        GetLeftWheelOdem()
-        GetRightWheelOdem()
-        GetLinerVelocity()
-        GetAngularVelocity()
-        GetErrorCode()
-
-    """
-
-    def __init__(self, *device_args, **device_kwargs):
-        self.device = None
-        can_device_init_fn = DeviceCan.__init__
-        args_names = can_device_init_fn.__code__.co_varnames[:
-                                                             can_device_init_fn
-                                                             .__code__.
-                                                             co_argcount]
-        args_dict = dict(zip(args_names, device_args))
-        args_dict.update(device_kwargs)
-
-        self.device = DeviceCan(**args_dict)
-        self.base_version = self.device.base_verson
-    UGVBaseMsg._init()
-
-    def SendMsg(self, msg):
-        self.device.CanSend(msg)
-
-    def GetMsg(self):
-        return self.device.CanGet()
-
-    def SendVersionRequest(self):
-        """
-        Version Information Request
-        """
-        self.msg = Message(arbitration_id=UGVBaseMsg.CanIDV2.VERSION_REQUEST_ID,
-                           data=[0x01],
-                           is_extended_id=False)
-        self.SendMsg(self.msg)
-
-    def EnableCANCtrl(self):
-        """
-        控制底盘处于Can控制模式，需将遥控SWB拨到最上方
-        Control the chassis in Can control mode, you need to dial the remote control SWB to the top
-        """
-
-        self.msg = Message(arbitration_id=UGVBaseMsg.CanIDV2.CTRL_MODE_CONFIG_ID,
-                           data=[0x01],
-                           is_extended_id=False)
-        self.SendMsg(self.msg)
-
-    def SetMotionCommand(self,
-                         linear_vel: float = 0.0,
-                         angular_vel: float = 0.0,
-                         lateral_vel: float = 0.0,
-                         steering_angle: float = 0.0):
-
+    def ListenMessage(self, msg):
         if self.base_version == 1:
-            if abs(angular_vel)>abs(steering_angle):
-                angular=angular_vel
-            else: angular = steering_angle
-            msg = Message(arbitration_id=UGVBaseMsg.CanIDV1.MOTION_COMMAND_ID,
-                          data=[
-                              0x01,
-                              0,
-                              (int(linear_vel )& 0xff),
-                              (int(angular) & 0xff),
-                              (int(lateral_vel) & 0xff),
-                              0,
-                              0,
-                              0,
-                          ],
-                          is_extended_id=False)
-            self.SendMsg(msg)
-
+            self.ProcessMessageV1(msg)
         elif self.base_version == 2:
-            linear_cmd = linear_vel * 1000
-            angular_cmd = angular_vel * 1000
-            lateral_cmd = lateral_vel * 1000
-            steering_cmd = steering_angle * 1000
-            msg = Message(arbitration_id=UGVBaseMsg.CanIDV2.MOTION_COMMAND_ID,
-                          data=[
-                              int(linear_cmd) >> 8 & 0xff,
-                              (int(linear_cmd) & 0x00ff),
-                              int(angular_cmd) >> 8 & 0xff,
-                              (int(angular_cmd) & 0x00ff),
-                              int(lateral_cmd) >> 8 & 0xff,
-                              (int(lateral_cmd) & 0x00ff),
-                              int(steering_cmd) >> 8 & 0xff,
-                              (int(steering_cmd) & 0x00ff)
-                          ],
-                          is_extended_id=False)
-            self.SendMsg(msg)
-
-    def SetLightCommand(self, front_mode: int = 0, front_custom_value: int = 0, rear_mode: int = 0, rear_custom_value: int = 0):
-        if self.base_version==1:
-            msg = Message(arbitration_id=UGVBaseMsg.CanIDV1.LIGHT_COMMAND_ID,
-                        data=[
-                            0x01,
-                            front_mode,
-                            front_custom_value,
-                            rear_mode,
-                            rear_custom_value,
-                            0,
-                            0,
-                            0
-                        ],
-                        is_extended_id=False)
-        elif self.base_version==2:
-            msg = Message(arbitration_id=UGVBaseMsg.CanIDV2.LIGHT_COMMAND_ID,
-                        data=[
-                            0x01,
-                            front_mode,
-                            front_custom_value,
-                            rear_mode,
-                            rear_custom_value,
-                            0,
-                            0,
-                            0
-                        ],
-                        is_extended_id=False)
-        self.SendMsg(msg)
+            self.ProcessMessageV2(msg)
