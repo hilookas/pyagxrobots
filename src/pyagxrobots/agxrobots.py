@@ -109,14 +109,14 @@ class UGV:
     def ProcessMessageV1(self, msg):
         if (msg.arbitration_id == UGVBaseMsg.CanIDV1.SYSTEM_STATE_ID):
             vehicle_state = int(msg.data[0])
-            UGVBaseMsg.SetVehicleState(vehicle_state)
+            UGVBaseMsg.SetValue('VehicleState', vehicle_state)
             control_mode = msg.data[1]
-            UGVBaseMsg.SetControlMode(control_mode)
+            UGVBaseMsg.SetValue('ControlMode', control_mode)
             battery_voltage = float((msg.data[2] & 0xff) << 8
                                     | msg.data[3]) / 10
-            UGVBaseMsg.SetBatteryVoltage(battery_voltage)
+            UGVBaseMsg.SetValue('BatteryVoltage', battery_voltage)
             error_code = (msg.data[4] << 8) | msg.data[5]
-            UGVBaseMsg.SetErrorCode(error_code)
+            UGVBaseMsg.SetValue('ErrorCode', error_code)
 
             # print(
             #     'vehicle_state:%s control_mode:%s battery_voltage:%s error_code:%s  count_num:%s'
@@ -128,15 +128,15 @@ class UGV:
 
             linear_velocity = float(linear_velocity_get.value / 1000)
             # print(int(linear_velocity))
-            UGVBaseMsg.SetLinearVelocity(linear_velocity)
+            UGVBaseMsg.SetValue('LinearVelocity', linear_velocity)
             angular_velocity_get = ctypes.c_int16((msg.data[2] & 0xff) << 8
                                                   | msg.data[3])
             angular_velocity = float(angular_velocity_get.value / 1000)
-            UGVBaseMsg.SetAngularVelocity(angular_velocity)
+            UGVBaseMsg.SetValue('AngularVelocity', angular_velocity)
             lateral_velocity_get = ctypes.c_int16((msg.data[4] & 0xff) << 8
                                                   | msg.data[5])
             lateral_velocity = float(lateral_velocity_get.value / 1000)
-            UGVBaseMsg.SetLateralVelocity(lateral_velocity)
+            UGVBaseMsg.SetValue('LateralVelocity', lateral_velocity)
 
             # print(msg)
 
@@ -147,62 +147,62 @@ class UGV:
             #        steering_angle))
         elif (msg.arbitration_id == UGVBaseMsg.CanIDV1.LIGHT_STATE_ID):
             light_cmd_ctrl = (msg.data[0])
-            UGVBaseMsg.SetLightCmdCtrl(light_cmd_ctrl)
+            UGVBaseMsg.SetValue('LightCmdCtrl', light_cmd_ctrl)
             front_mode = (msg.data[1])
-            UGVBaseMsg.SetFrontMode(front_mode)
+            UGVBaseMsg.SetValue('FrontMode', front_mode)
             front_custom = (msg.data[2])
-            UGVBaseMsg.SetFrontCustom(front_custom)
+            UGVBaseMsg.SetValue('FrontCustom', front_custom)
             rear_mode = (msg.data[3])
-            UGVBaseMsg.SetRearMode(rear_mode)
+            UGVBaseMsg.SetValue('RearMode', rear_mode)
             rear_custom = (msg.data[4])
-            UGVBaseMsg.SetRearCustom(rear_custom)
+            UGVBaseMsg.SetValue('RearCustom', rear_custom)
 
         elif (msg.arbitration_id == UGVBaseMsg.CanIDV1.VALUE_SET_STATE_ID):
             if (msg.data[0] == 0xaa):
                 base_neutral = True
             else:
                 base_neutral = False
-            UGVBaseMsg.SetBaseNeutral(base_neutral)
+            UGVBaseMsg.SetValue('BaseNeutral', base_neutral)
 
         elif(msg.arbitration_id == UGVBaseMsg.CanIDV1.ACTUATOR1_STATE_ID):
             current1 = float((msg.data[0] << 8 | msg.data[1])/10.0)
-            UGVBaseMsg.SetCurrent1(current1)
+            UGVBaseMsg.SetValue('Current1', current1)
             rpm1 = ctypes.c_int16(msg.data[2] << 8 | msg.data[3]).value
-            UGVBaseMsg.SetRpm1(rpm1)
+            UGVBaseMsg.SetValue('Rpm1', rpm1)
             driver1_temp = msg.date[4]
-            UGVBaseMsg.SetDriver1State(driver1_temp)
+            UGVBaseMsg.SetValue('Driver1State', driver1_temp)
             motor1_temp = msg.data[5]
-            UGVBaseMsg.SetMotor1Temp(motor1_temp)
+            UGVBaseMsg.SetValue('Motor1Temp', motor1_temp)
 
         elif(msg.arbitration_id == UGVBaseMsg.CanIDV1.ACTUATOR2_STATE_ID):
             current2 = float((msg.data[0] << 8 | msg.data[1])/10.0)
-            UGVBaseMsg.SetCurrent2(current2)
+            UGVBaseMsg.SetValue('Current2', current2)
             rpm2 = ctypes.c_int16(msg.data[2] << 8 | msg.data[3]).value
-            UGVBaseMsg.SetRpm2(rpm2)
+            UGVBaseMsg.SetValue('Rpm2', rpm2)
             driver2_temp = msg.date[4]
-            UGVBaseMsg.SetDriver2State(driver2_temp)
+            UGVBaseMsg.SetValue('Driver2State', driver2_temp)
             motor2_temp = msg.data[5]
-            UGVBaseMsg.SetMotor2Temp(motor2_temp)
+            UGVBaseMsg.SetValue('Motor2Temp', motor2_temp)
 
         elif(msg.arbitration_id == UGVBaseMsg.CanIDV1.ACTUATOR3_STATE_ID):
             current3 = float((msg.data[0] << 8 | msg.data[1])/10.0)
-            UGVBaseMsg.SetCurrent3(current3)
+            UGVBaseMsg.SetValue('Current3', current3)
             rpm3 = ctypes.c_int16(msg.data[2] << 8 | msg.data[3]).value
-            UGVBaseMsg.SetRpm3(rpm3)
+            UGVBaseMsg.SetValue('Rpm3', rpm3)
             driver3_temp = msg.date[4]
-            UGVBaseMsg.SetDriver3State(driver3_temp)
+            UGVBaseMsg.SetValue('Driver3State', driver3_temp)
             motor3_temp = msg.data[5]
-            UGVBaseMsg.SetMotor3Temp(motor3_temp)
+            UGVBaseMsg.SetValue('Motor3Temp', motor3_temp)
 
         elif(msg.arbitration_id == UGVBaseMsg.CanIDV1.ACTUATOR4_STATE_ID):
             current4 = float((msg.data[0] << 8 | msg.data[1])/10.0)
-            UGVBaseMsg.SetCurrent4(current4)
+            UGVBaseMsg.SetValue('Current4', current4)
             rpm4 = ctypes.c_int16(msg.data[2] << 8 | msg.data[3]).value
-            UGVBaseMsg.SetRpm4(rpm4)
+            UGVBaseMsg.SetValue('Rpm4', rpm4)
             driver4_temp = msg.date[4]
-            UGVBaseMsg.SetDriver4State(driver4_temp)
+            UGVBaseMsg.SetValue('Driver4State', driver4_temp)
             motor4_temp = msg.data[5]
-            UGVBaseMsg.SetMotor4Temp(motor4_temp)
+            UGVBaseMsg.SetValue('Motor4Temp', motor4_temp)
 
     def ProcessMessageV2(self, msg):
         """
@@ -212,14 +212,14 @@ class UGV:
         msg = msg
         if (msg.arbitration_id == UGVBaseMsg.CanIDV2.SYSTEM_STATE_ID):
             vehicle_state = int(msg.data[0])
-            UGVBaseMsg.SetVehicleState(vehicle_state)
+            UGVBaseMsg.SetValue('VehicleState', vehicle_state)
             control_mode = msg.data[1]
-            UGVBaseMsg.SetControlMode(control_mode)
+            UGVBaseMsg.SetValue('ControlMode', control_mode)
             battery_voltage = float((msg.data[2] & 0xff) << 8
                                     | msg.data[3]) / 10
-            UGVBaseMsg.SetBatteryVoltage(battery_voltage)
+            UGVBaseMsg.SetValue('BatteryVoltage', battery_voltage)
             error_code = msg.data[5]
-            UGVBaseMsg.SetErrorCode(error_code)
+            UGVBaseMsg.SetValue('ErrorCode', error_code)
             count_num = msg.data[7]
 
             # print(
@@ -232,19 +232,19 @@ class UGV:
 
             linear_velocity = float(linear_velocity_get.value / 1000)
             # print(int(linear_velocity))
-            UGVBaseMsg.SetLinearVelocity(linear_velocity)
+            UGVBaseMsg.SetValue('LinearVelocity', linear_velocity)
             angular_velocity_get = ctypes.c_int16((msg.data[2] & 0xff) << 8
                                                   | msg.data[3])
             angular_velocity = float(angular_velocity_get.value / 1000)
-            UGVBaseMsg.SetAngularVelocity(angular_velocity)
+            UGVBaseMsg.SetValue('AngularVelocity', angular_velocity)
             lateral_velocity_get = ctypes.c_int16((msg.data[4] & 0xff) << 8
                                                   | msg.data[5])
             lateral_velocity = float(lateral_velocity_get.value / 1000)
-            UGVBaseMsg.SetLateralVelocity(lateral_velocity)
+            UGVBaseMsg.SetValue('LateralVelocity', lateral_velocity)
             steering_angle_get = ctypes.c_int16((msg.data[6] & 0xff) << 8
                                                 | msg.data[7])
             steering_angle = float(steering_angle_get.value / 1000)
-            UGVBaseMsg.SetSteeringAngle(steering_angle)
+            UGVBaseMsg.SetValue('SteeringAngle', steering_angle)
             # print(msg)
 
             # print(msg)
@@ -255,53 +255,53 @@ class UGV:
 
         elif (msg.arbitration_id == UGVBaseMsg.CanIDV2.ACTUATOR1_HS_STATE_ID):
             rpm1 = int((msg.data[0] & 0xff) << 8 | msg.data[1])
-            UGVBaseMsg.SetRpm1(rpm1)
+            UGVBaseMsg.SetValue('Rpm1', rpm1)
             current1 = float((msg.data[2] & 0xff) << 8 | msg.data[3]) * 0.1
-            UGVBaseMsg.SetCurrent1(current1)
+            UGVBaseMsg.SetValue('Current1', current1)
             pulse_count1 = int((msg.data[4] & 0xff) << 24
                                | (msg.data[5] & 0xff) << 16
                                | (msg.data[6] & 0xff) << 8
                                | msg.data[7])
-            UGVBaseMsg.SetPulseCount1(pulse_count1)
+            UGVBaseMsg.SetValue('PulseCount1', pulse_count1)
             # print('rpm1:%s current1:%s pulse_count1:%s ' %
             #       (rpm1, current1, pulse_count1))
 
         elif (msg.arbitration_id == UGVBaseMsg.CanIDV2.ACTUATOR2_HS_STATE_ID):
             rpm2 = int((msg.data[0] & 0xff) << 8 | msg.data[1])
-            UGVBaseMsg.SetRpm2(rpm2)
+            UGVBaseMsg.SetValue('Rpm2', rpm2)
             current2 = float((msg.data[2] & 0xff) << 8 | msg.data[3]) * 0.1
-            UGVBaseMsg.SetCurrent2(current2)
+            UGVBaseMsg.SetValue('Current2', current2)
             pulse_count2 = int((msg.data[4] & 0xff) << 24
                                | (msg.data[5] & 0xff) << 16
                                | (msg.data[6] & 0xff) << 8
                                | msg.data[7])
-            UGVBaseMsg.SetPulseCount2(pulse_count2)
+            UGVBaseMsg.SetValue('PulseCount2', pulse_count2)
             # print('rpm2:%s current2:%s pulse_count2:%s ' %
             #       (rpm2, current2, pulse_count2))
 
         elif (msg.arbitration_id == UGVBaseMsg.CanIDV2.ACTUATOR3_HS_STATE_ID):
             rpm3 = int((msg.data[0] & 0xff) << 8 | msg.data[1])
-            UGVBaseMsg.SetRpm3(rpm3)
+            UGVBaseMsg.SetValue('Rpm3', rpm3)
             current3 = float((msg.data[2] & 0xff) << 8 | msg.data[3]) * 0.1
-            UGVBaseMsg.SetCurrent3(current3)
+            UGVBaseMsg.SetValue('Current3', current3)
             pulse_count3 = int((msg.data[4] & 0xff) << 24
                                | (msg.data[5] & 0xff) << 16
                                | (msg.data[6] & 0xff) << 8
                                | msg.data[7])
-            UGVBaseMsg.SetPulseCount3(pulse_count3)
+            UGVBaseMsg.SetValue('PulseCount3', pulse_count3)
             # print('rpm3:%s current3:%s pulse_count3:%s ' %
             #       (rpm3, current3, pulse_count3))
 
         elif (msg.arbitration_id == UGVBaseMsg.CanIDV2.ACTUATOR4_HS_STATE_ID):
             rpm4 = int((msg.data[0] & 0xff) << 8 | msg.data[1])
-            UGVBaseMsg.SetRpm4(rpm4)
+            UGVBaseMsg.SetValue('Rpm4', rpm4)
             current4 = float((msg.data[2] & 0xff) << 8 | msg.data[3]) * 0.1
-            UGVBaseMsg.SetCurrent4(current4)
+            UGVBaseMsg.SetValue('Current4', current4)
             pulse_count4 = int((msg.data[4] & 0xff) << 24
                                | (msg.data[5] & 0xff) << 16
                                | (msg.data[6] & 0xff) << 8
                                | msg.data[7])
-            UGVBaseMsg.SetPulseCount4(pulse_count4)
+            UGVBaseMsg.SetValue('PulseCount4', pulse_count4)
 
             # print('rpm4:%s current4:%s pulse_count4:%s ' %
             #       (rpm4, current4, pulse_count4))
@@ -309,13 +309,13 @@ class UGV:
         elif (msg.arbitration_id == UGVBaseMsg.CanIDV2.ACTUATOR1_LS_STATE_ID):
             driver1_voltage = float((msg.data[0] & 0xff) << 8
                                     | msg.data[1]) * 0.1
-            UGVBaseMsg.SetDriver1Voltage(driver1_voltage)
+            UGVBaseMsg.SetValue('Driver1Voltage', driver1_voltage)
             driver1_temp = int((msg.data[2] & 0xff) << 8 | msg.data[3])
-            UGVBaseMsg.SetDriver1Temp(driver1_temp)
+            UGVBaseMsg.SetValue('Driver1Temp', driver1_temp)
             motor1_temp = msg.data[4]
-            UGVBaseMsg.SetMotor1Temp(motor1_temp)
+            UGVBaseMsg.SetValue('Motor1Temp', motor1_temp)
             driver1_state = msg.data[5]
-            UGVBaseMsg.SetDriver1State(driver1_state)
+            UGVBaseMsg.SetValue('Driver1State', driver1_state)
             # print(
             #     'driver_voltage1:%s driver_temp1:%s motor_temp%s driver_state1:%s '
             #     % (driver1_voltage, driver1_temp, motor1_temp, driver1_state))
@@ -323,54 +323,54 @@ class UGV:
         elif (msg.arbitration_id == UGVBaseMsg.CanIDV2.ACTUATOR2_LS_STATE_ID):
             driver2_voltage = float((msg.data[0] & 0xff) << 8
                                     | msg.data[1]) * 0.1
-            UGVBaseMsg.SetDriver2Voltage(driver2_voltage)
+            UGVBaseMsg.SetValue('Driver2Voltage', driver2_voltage)
             driver2_temp = int((msg.data[2] & 0xff) << 8 | msg.data[3])
-            UGVBaseMsg.SetDriver2Temp(driver2_temp)
+            UGVBaseMsg.SetValue('Driver2Temp', driver2_temp)
             motor2_temp = msg.data[4]
-            UGVBaseMsg.SetMotor2Temp(motor2_temp)
+            UGVBaseMsg.SetValue('Motor2Temp', motor2_temp)
             driver2_state = msg.data[5]
-            UGVBaseMsg.SetDriver2State(driver2_state)
+            UGVBaseMsg.SetValue('Driver2State', driver2_state)
             # print(
             #     'driver_voltage2:%s driver_temp2:%s  motor_temp2:%s driver_state2:%s '
             #     % (driver2_voltage, driver2_temp, motor2_temp, driver2_state))
         elif (msg.arbitration_id == UGVBaseMsg.CanIDV2.ACTUATOR3_LS_STATE_ID):
             driver3_voltage = float((msg.data[0] & 0xff) << 8
                                     | msg.data[1]) * 0.1
-            UGVBaseMsg.SetDriver3Voltage(driver3_voltage)
+            UGVBaseMsg.SetValue('Driver3Voltage', driver3_voltage)
             driver3_temp = int((msg.data[2] & 0xff) << 8 | msg.data[3])
-            UGVBaseMsg.SetDriver3Temp(driver3_temp)
+            UGVBaseMsg.SetValue('Driver3Temp', driver3_temp)
             motor3_temp = msg.data[4]
-            UGVBaseMsg.SetMotor3Temp(motor3_temp)
+            UGVBaseMsg.SetValue('Motor3Temp', motor3_temp)
             driver3_state = msg.data[5]
-            UGVBaseMsg.SetDriver3State(driver3_state)
+            UGVBaseMsg.SetValue('Driver3State', driver3_state)
             # print(
             #     'driver_voltage3:%s driver_temp3:%s  motor_temp3:%s driver_state3:%s '
             #     % (driver3_voltage, driver3_temp, motor3_temp, driver3_state))
         elif (msg.arbitration_id == UGVBaseMsg.CanIDV2.ACTUATOR4_LS_STATE_ID):
             driver4_voltage = float((msg.data[0] & 0xff) << 8
                                     | msg.data[1]) * 0.1
-            UGVBaseMsg.SetDriver4Voltage(driver4_voltage)
+            UGVBaseMsg.SetValue('Driver4Voltage', driver4_voltage)
             driver4_temp = int((msg.data[2] & 0xff) << 8 | msg.data[3])
-            UGVBaseMsg.SetDriver4Temp(driver4_temp)
+            UGVBaseMsg.SetValue('Driver4Temp', driver4_temp)
             motor4_temp = msg.data[4]
-            UGVBaseMsg.SetMotor4Temp(motor4_temp)
+            UGVBaseMsg.SetValue('Motor4Temp', motor4_temp)
             driver4_state = msg.data[5]
-            UGVBaseMsg.SetDriver4State(driver4_state)
+            UGVBaseMsg.SetValue('Driver4State', driver4_state)
             # print(
             #     'driver_voltage4:%s driver_temp4:%s  motor_temp:%s driver_state4:%s '
             #     % (driver4_voltage, driver4_temp, motor4_temp, driver4_state))
 
         elif (msg.arbitration_id == UGVBaseMsg.CanIDV2.LIGHT_STATE_ID):
             light_cmd_ctrl = (msg.data[0])
-            UGVBaseMsg.SetLightCmdCtrl(light_cmd_ctrl)
+            UGVBaseMsg.SetValue('LightCmdCtrl', light_cmd_ctrl)
             front_mode = (msg.data[1])
-            UGVBaseMsg.SetFrontMode(front_mode)
+            UGVBaseMsg.SetValue('FrontMode', front_mode)
             front_custom = (msg.data[2])
-            UGVBaseMsg.SetFrontCustom(front_custom)
+            UGVBaseMsg.SetValue('FrontCustom', front_custom)
             rear_mode = (msg.data[3])
-            UGVBaseMsg.SetRearMode(rear_mode)
+            UGVBaseMsg.SetValue('RearMode', rear_mode)
             rear_custom = (msg.data[4])
-            UGVBaseMsg.SetRearCustom(rear_custom)
+            UGVBaseMsg.SetValue('RearCustom', rear_custom)
 
             # print(
             #     'enable_cmd_ctrl:%s front_mode:%s  front_custom:%s rear_mode:%s  rear_custom:%s'
@@ -379,16 +379,16 @@ class UGV:
         elif (msg.arbitration_id == UGVBaseMsg.CanIDV2.VERSION_RESPONSE_ID):
             control_hardware_version = int((msg.data[0] & 0xff) << 8
                                            | msg.data[1])
-            UGVBaseMsg.SetControlHardwareVersion(control_hardware_version)
+            UGVBaseMsg.SetValue('ControlHardwareVersion', control_hardware_version)
             actuaror_hardware_version = int((msg.data[2] & 0xff) << 8
                                             | msg.data[3])
-            UGVBaseMsg.SetActuarorHardwareVersion(actuaror_hardware_version)
+            UGVBaseMsg.SetValue('ActuarorHardwareVersion', actuaror_hardware_version)
             control_software_version = int((msg.data[4] & 0xff) << 8
                                            | msg.data[5])
-            UGVBaseMsg.SetControlSoftwareVersion(control_software_version)
+            UGVBaseMsg.SetValue('ControlSoftwareVersion', control_software_version)
             actuaror_software_version = int((msg.data[6] & 0xff) << 8
                                             | msg.data[7])
-            UGVBaseMsg.SetActuarorSoftwareVersion(actuaror_software_version)
+            UGVBaseMsg.SetValue('ActuarorSoftwareVersion', actuaror_software_version)
             # print(
             #     'control_hardware_version: %s actuaror_hardware_version: %s' %
             #     (control_hardware_version, actuaror_hardware_version))
@@ -401,7 +401,7 @@ class UGV:
                                           | (msg.data[2] & 0xff) << 8
                                           | msg.data[3])
             left_wheel = left_wheel_get.value
-            UGVBaseMsg.SetLeftWheel(left_wheel)
+            UGVBaseMsg.SetValue('LeftWheel', left_wheel)
             right_wheel_get = ctypes.c_int((msg.data[4] & 0xff) << 24
                                            | (msg.data[5] & 0xff) << 16
                                            | (msg.data[6] & 0xff) << 8
@@ -409,21 +409,21 @@ class UGV:
             # print('left_wheel: %s right_wheel: %s ' %
             #       (left_wheel, right_wheel))
             right_wheel = right_wheel_get.value
-            UGVBaseMsg.SetRightWheel(right_wheel)
+            UGVBaseMsg.SetValue('RightWheel', right_wheel)
             # print(msg)
         elif (msg.arbitration_id == UGVBaseMsg.CanIDV2.RC_STATE_ID):
             sws = msg.data[0]
-            UGVBaseMsg.SetSws(sws)
+            UGVBaseMsg.SetValue('Sws', sws)
             stick_right_v = msg.data[1]
-            UGVBaseMsg.SetStickRightV(stick_right_v)
+            UGVBaseMsg.SetValue('StickRightV', stick_right_v)
             stick_right_h = msg.data[2]
-            UGVBaseMsg.SetStickRightH(stick_right_h)
+            UGVBaseMsg.SetValue('StickRightH', stick_right_h)
             stick_left_v = msg.data[3]
-            UGVBaseMsg.SetStickLeftV(stick_left_v)
+            UGVBaseMsg.SetValue('StickLeftV', stick_left_v)
             stick_left_h = msg.data[4]
-            UGVBaseMsg.SetStickLeftH(stick_left_h)
+            UGVBaseMsg.SetValue('StickLeftH', stick_left_h)
             var_a = msg.data[5]
-            UGVBaseMsg.SetVarA(var_a)
+            UGVBaseMsg.SetValue('VarA', var_a)
 
     def ListenMessage(self, msg):
         if self.base_version == 1:

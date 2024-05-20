@@ -3,77 +3,77 @@ import pyagxrobots.UGVConfigMsg as UGVBaseMsg
 
 class MotionCommandMessage(object):
     def GetLinearVelocity(self):
-        return float(UGVBaseMsg.GetLinearVelocity())
+        return float(UGVBaseMsg.GetValue('LinearVelocity'))
 
     def GetAngularVelocity(self):
         # // only valid for differential drivering
-        return float(UGVBaseMsg.GetAngularVelocity())
+        return float(UGVBaseMsg.GetValue('AngularVelocity'))
 
     def GetLateralVelocity(self):
-        return float(UGVBaseMsg.GetLateralVelocity())
+        return float(UGVBaseMsg.GetValue('LateralVelocity'))
 
     def GetSteeringAngle(self):
         # // only valid for ackermann steering
-        return float(UGVBaseMsg.GetSteeringAngle())
+        return float(UGVBaseMsg.GetValue('SteeringAngle'))
 
 
 class LightCommandMessage(object):
     def GetLightCmdCtrl(self):
-        return UGVBaseMsg.GetLightCmdCtrl()
+        return UGVBaseMsg.GetValue('LightCmdCtrl')
 
     def GetFrontMode(self):
-        return UGVBaseMsg.GetFrontMode()
+        return UGVBaseMsg.GetValue('FrontMode')
 
     def GetFrontCustom(self):
-        return UGVBaseMsg.GetFrontCustom()
+        return UGVBaseMsg.GetValue('FrontCustom')
 
     def GetRearMode(self):
-        return UGVBaseMsg.GetRearMode()
+        return UGVBaseMsg.GetValue('RearMode')
 
     def GetRearCustom(self):
-        return UGVBaseMsg.GetRearCustom()
+        return UGVBaseMsg.GetValue('RearCustom')
 
 
 class SystemStateMessage(object):
     def GetVehicleState(self):
-        return UGVBaseMsg.GetVehicleState()
+        return UGVBaseMsg.GetValue('VehicleState')
 
     def GetControlMode(self):
-        return UGVBaseMsg.GetControlMode()
+        return UGVBaseMsg.GetValue('ControlMode')
 
     def GetBatteryVoltage(self):
-        return float(UGVBaseMsg.GetBatteryVoltage())
+        return float(UGVBaseMsg.GetValue('BatteryVoltage'))
 
     def GetErrorCode(self):
-        return UGVBaseMsg.GetErrorCode()
+        return UGVBaseMsg.GetValue('ErrorCode')
 
 
 class RcStateMessage(object):
     def GetVarA(self):
-        return UGVBaseMsg.GetVarA()
+        return UGVBaseMsg.GetValue('VarA')
 
     def GetSws(self):
-        return UGVBaseMsg.GetSws()
+        return UGVBaseMsg.GetValue('Sws')
 
     def GetStickRightV(self):
-        return UGVBaseMsg.GetStickRightV()
+        return UGVBaseMsg.GetValue('StickRightV')
 
     def GetStickRightH(self):
-        return UGVBaseMsg.GetStickRightH()
+        return UGVBaseMsg.GetValue('StickRightH')
 
     def GetStickLeftV(self):
-        return UGVBaseMsg.GetStickLeftV()
+        return UGVBaseMsg.GetValue('StickLeftV')
 
     def GetStickLeftH(self):
-        return UGVBaseMsg.GetStickLeftH()
+        return UGVBaseMsg.GetValue('StickLeftH')
 
 
 class OdometryMessage(object):
     def GetLeftWheel(self):
-        return float(UGVBaseMsg.GetLeftWheel())
+        return float(UGVBaseMsg.GetValue('LeftWheel'))
 
     def GetRightWheel(self):
-        return float(UGVBaseMsg.GetRightWheel())
+        return float(UGVBaseMsg.GetValue('RightWheel'))
 
 
 class ActuatorStateMessageV1(object):
@@ -82,43 +82,43 @@ class ActuatorStateMessageV1(object):
 
     def current(self):
         if self.motro_id == 1:
-            return UGVBaseMsg.GetCurrent1()
+            return UGVBaseMsg.GetValue('Current1')
         elif self.motro_id == 2:
-            return UGVBaseMsg.GetCurrent2()
+            return UGVBaseMsg.GetValue('Current2')
         elif self.motro_id == 3:
-            return UGVBaseMsg.GetCurrent3()
+            return UGVBaseMsg.GetValue('Current3')
         elif self.motro_id == 4:
-            return UGVBaseMsg.GetCurrent4()
+            return UGVBaseMsg.GetValue('Current4')
 
     def rpm(self):
         if self.motro_id == 1:
-            return UGVBaseMsg.GetRpm1()
+            return UGVBaseMsg.GetValue('Rpm1')
         elif self.motro_id == 2:
-            return UGVBaseMsg.GetRpm2()
+            return UGVBaseMsg.GetValue('Rpm2')
         elif self.motro_id == 3:
-            return UGVBaseMsg.GetRpm3()
+            return UGVBaseMsg.GetValue('Rpm3')
         elif self.motro_id == 4:
-            return UGVBaseMsg.GetRpm4()
+            return UGVBaseMsg.GetValue('Rpm4')
 
     def driver_temp(self):
         if self.motro_id == 1:
-            return UGVBaseMsg.GetDriver1Temp()
+            return UGVBaseMsg.GetValue('Driver1Temp')
         elif self.motro_id == 2:
-            return UGVBaseMsg.GetDriver2Temp()
+            return UGVBaseMsg.GetValue('Driver2Temp')
         elif self.motro_id == 3:
-            return UGVBaseMsg.GetDriver3Temp()
+            return UGVBaseMsg.GetValue('Driver3Temp')
         elif self.motro_id == 4:
-            return UGVBaseMsg.GetDriver4Temp()
+            return UGVBaseMsg.GetValue('Driver4Temp')
 
     def motor_temp(self):
         if self.motro_id == 1:
-            return UGVBaseMsg.GetMotor1Temp()
+            return UGVBaseMsg.GetValue('Motor1Temp')
         elif self.motro_id == 2:
-            return UGVBaseMsg.GetMotor2Temp()
+            return UGVBaseMsg.GetValue('Motor2Temp')
         elif self.motro_id == 3:
-            return UGVBaseMsg.GetMotor3Temp()
+            return UGVBaseMsg.GetValue('Motor3Temp')
         elif self.motro_id == 4:
-            return UGVBaseMsg.GetMotor4Temp()
+            return UGVBaseMsg.GetValue('Motor4Temp')
 
 
 class ActuatorStateMessageV2(object):
@@ -127,73 +127,73 @@ class ActuatorStateMessageV2(object):
 
     def rpm(self):
         if self.motro_id == 1:
-            return UGVBaseMsg.GetRpm1()
+            return UGVBaseMsg.GetValue('Rpm1')
         elif self.motro_id == 2:
-            return UGVBaseMsg.GetRpm2()
+            return UGVBaseMsg.GetValue('Rpm2')
         elif self.motro_id == 3:
-            return UGVBaseMsg.GetRpm3()
+            return UGVBaseMsg.GetValue('Rpm3')
         elif self.motro_id == 4:
-            return UGVBaseMsg.GetRpm4()
+            return UGVBaseMsg.GetValue('Rpm4')
 
     def current(self):
         if self.motro_id == 1:
-            return UGVBaseMsg.GetCurrent1()
+            return UGVBaseMsg.GetValue('Current1')
         elif self.motro_id == 2:
-            return UGVBaseMsg.GetCurrent2()
+            return UGVBaseMsg.GetValue('Current2')
         elif self.motro_id == 3:
-            return UGVBaseMsg.GetCurrent3()
+            return UGVBaseMsg.GetValue('Current3')
         elif self.motro_id == 4:
-            return UGVBaseMsg.GetCurrent4()
+            return UGVBaseMsg.GetValue('Current4')
 
     def pulse_count(self):
         if self.motro_id == 1:
-            return UGVBaseMsg.GetPulseCount1()
+            return UGVBaseMsg.GetValue('PulseCount1')
         elif self.motro_id == 2:
-            return UGVBaseMsg.GetPulseCount2()
+            return UGVBaseMsg.GetValue('PulseCount2')
         elif self.motro_id == 3:
-            return UGVBaseMsg.GetPulseCount3()
+            return UGVBaseMsg.GetValue('PulseCount3')
         elif self.motro_id == 4:
-            return UGVBaseMsg.GetPulseCount4()
+            return UGVBaseMsg.GetValue('PulseCount4')
 
     def driver_voltage(self):
         if self.motro_id == 1:
-            return UGVBaseMsg.GetDriver1Voltage()
+            return UGVBaseMsg.GetValue('Driver1Voltage')
         elif self.motro_id == 2:
-            return UGVBaseMsg.GetDriver2Voltage()
+            return UGVBaseMsg.GetValue('Driver2Voltage')
         elif self.motro_id == 3:
-            return UGVBaseMsg.GetDriver3Voltage()
+            return UGVBaseMsg.GetValue('Driver3Voltage')
         elif self.motro_id == 4:
-            return UGVBaseMsg.GetDriver4Voltage()
+            return UGVBaseMsg.GetValue('Driver4Voltage')
 
     def driver_temp(self):
         if self.motro_id == 1:
-            return UGVBaseMsg.GetDriver1Temp()
+            return UGVBaseMsg.GetValue('Driver1Temp')
         elif self.motro_id == 2:
-            return UGVBaseMsg.GetDriver2Temp()
+            return UGVBaseMsg.GetValue('Driver2Temp')
         elif self.motro_id == 3:
-            return UGVBaseMsg.GetDriver3Temp()
+            return UGVBaseMsg.GetValue('Driver3Temp')
         elif self.motro_id == 4:
-            return UGVBaseMsg.GetDriver4Temp()
+            return UGVBaseMsg.GetValue('Driver4Temp')
 
     def motor_temp(self):
         if self.motro_id == 1:
-            return UGVBaseMsg.GetMotor1Temp()
+            return UGVBaseMsg.GetValue('Motor1Temp')
         elif self.motro_id == 2:
-            return UGVBaseMsg.GetMotor2Temp()
+            return UGVBaseMsg.GetValue('Motor2Temp')
         elif self.motro_id == 3:
-            return UGVBaseMsg.GetMotor3Temp()
+            return UGVBaseMsg.GetValue('Motor3Temp')
         elif self.motro_id == 4:
-            return UGVBaseMsg.GetMotor4Temp()
+            return UGVBaseMsg.GetValue('Motor4Temp')
 
     def driver_state(self):
         if self.motro_id == 1:
-            return UGVBaseMsg.GetDriver1State()
+            return UGVBaseMsg.GetValue('Driver1State')
         elif self.motro_id == 2:
-            return UGVBaseMsg.GetDriver2State()
+            return UGVBaseMsg.GetValue('Driver2State')
         elif self.motro_id == 3:
-            return UGVBaseMsg.GetDriver3State()
+            return UGVBaseMsg.GetValue('Driver3State')
         elif self.motro_id == 4:
-            return UGVBaseMsg.GetDriver4State()
+            return UGVBaseMsg.GetValue('Driver4State')
 
 
 class GetRobotStae(MotionCommandMessage,
